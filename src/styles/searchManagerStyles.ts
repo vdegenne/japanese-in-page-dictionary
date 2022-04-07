@@ -23,7 +23,16 @@ mwc-tab-bar {
 }
 
 #words-results, #kanji-results {
-  padding-bottom: 52px;
+  /* padding-bottom: 52px; */
+}
+
+#words-results > p, #kanji-results > p {
+  /* font-weight: 600; */
+  background-color: #e0e0e0;
+  color: white;
+  /* display: inline-block; */
+  padding: 2px 14px;
+  border-radius: 15px;
 }
 
 search-item-element {
@@ -31,5 +40,11 @@ search-item-element {
   /* padding-bottom: 15px;
   margin-bottom: 15px; */
   border-bottom: 1px solid #eeeeee;
+}
+search-item-element:first-of-type {
+  padding-top: 0;
+}
+search-item-element:last-of-type {
+  border-bottom: 0;
 }
 `

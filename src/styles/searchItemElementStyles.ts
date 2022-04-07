@@ -31,6 +31,9 @@ export const searchItemStyles = css`
   font-size: 1.5em;
   color: black;
 }
+:host .word[exactSearch] {
+  background-color: yellow;
+}
 :host .word .character {
   /* cursor: pointer; */
 }

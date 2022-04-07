@@ -33,7 +33,7 @@ export class SearchItemElement extends LitElement {
     const tagClassMap = classMap({
       'tag': true,
       'dictionary': true,
-      'not-found': this.item.dictionary === 'exact search not found',
+      'not-found': this.item.dictionary === 'not found',
       'jlpt5-color': this.item.dictionary === 'jlpt5',
       'jlpt4-color': this.item.dictionary === 'jlpt4',
       'jlpt3-color': this.item.dictionary === 'jlpt3',
@@ -50,7 +50,7 @@ export class SearchItemElement extends LitElement {
       <!-- MENU -->
       <mwc-menu>
         <mwc-list-item noninteractive>
-          <span>${this.item.word}</span>
+          <span style="font-family:'Sawarabi Mincho'">${this.item.word}</span>
         </mwc-list-item>
         <li divider role="separator"></li>
         <!-- google images -->
@@ -88,7 +88,7 @@ export class SearchItemElement extends LitElement {
     <div class=header>
       <!-- <mwc-icon-button icon=volume_up style="margin-right:5px;"
         @click=${e=>this.onSpeakerClick(e)}></mwc-icon-button> -->
-      <div class="word">
+      <div class="word" ?exactSearch=${this.item.exactSearch}>
         ${this.item.word.split('').map(c=>{
           const kanjiData = getKanjiData(c)
           return html`<span class=character

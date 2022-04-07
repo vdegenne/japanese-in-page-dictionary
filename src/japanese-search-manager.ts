@@ -5,6 +5,7 @@ import { JlptWordEntry, Kanji } from './types';
 import lemmas from '../data/lemmas.json'
 import { searchManagerStyles } from './styles/searchManagerStyles';
 import { googleImageSearch, jisho, mdbg, naver, playJapaneseAudio } from './util';
+import {hasChinese} from 'asian-regexps'
 
 import '@material/mwc-dialog'
 import '@material/mwc-textfield'
@@ -51,7 +52,7 @@ const jlpts: JlptWordEntry[][] = [
 // }
 // const jlpts = [jlpt5, jlpt4, jlpt3]
 
-export type Dictionaries = 'jlpt5'|'jlpt4'|'jlpt3'|'jlpt2'|'jlpt1'|'exact search not found';
+export type Dictionaries = 'jlpt5'|'jlpt4'|'jlpt3'|'jlpt2'|'jlpt1'|'not found';
 
 export type SearchItem = {
   type: ViewType;
@@ -60,6 +61,7 @@ export type SearchItem = {
   hiragana?: string;
   english?: string;
   frequency?: number;
+  exactSearch?: boolean;
 }
 const views = ['words', 'kanji'] as const
 declare type ViewType = typeof views[number];
@@ -70,6 +72,9 @@ export class JapaneseSearchManager extends LitElement {
   @state() view: ViewType = 'words';
   @state() query: string = '';
   @state() result: SearchItem[] = []
+
+  @state() showKanjiResult = true
+  @state() showWordsResult = true
 
   private _searchHistory: SearchHistoryItem[] = [{search: 'test', view: 'words'}]
 
@@ -117,12 +122,12 @@ export class JapaneseSearchManager extends LitElement {
     // console.log(this.query)
     return html`
     <mwc-dialog style="--mdc-dialog-min-width:calc(100vw - 32px);">
-      <mwc-tab-bar
+      <!-- <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
           activeIndex=${views.indexOf(this.view)}>
         <mwc-tab label=words></mwc-tab>
         <mwc-tab label=kanji></mwc-tab>
-      </mwc-tab-bar>
+      </mwc-tab-bar> -->
 
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
@@ -132,15 +137,24 @@ export class JapaneseSearchManager extends LitElement {
         <mwc-icon-button icon=close style="position:absolute;top:4px;right:4px;"
           @click=${()=>{this.query='';this.textfield.value = '';this.textfield.focus()}}></mwc-icon-button>
       </div>
-
-      <!-- WORDS RESULT -->
-      <div id="words-results" ?hide=${this.view !== 'words'}>
-        ${wordsResult.length === 0 ? html`no result` : nothing}
-        ${wordsResult.map(i=>html`<search-item-element .item=${i} .revealed=${!this.blindMode}></search-item-element>`)}
+      <!-- choice checkboxes -->
+      <div>
+        <mwc-formfield label="kanji">
+          <mwc-checkbox ?checked=${this.showKanjiResult}
+            ?disabled=${this.showKanjiResult && !this.showWordsResult}
+            @change=${e=>{this.showKanjiResult=e.target.checked}}></mwc-checkbox>
+        </mwc-formfield>
+        <mwc-formfield label="words">
+          <mwc-checkbox ?checked=${this.showWordsResult}
+            ?disabled=${this.showWordsResult && !this.showKanjiResult}
+            @change=${e=>{this.showWordsResult=e.target.checked}}></mwc-checkbox>
+        </mwc-formfield>
       </div>
 
+
       <!-- KANJI RESULT -->
-      <div id="kanji-results" ?hide=${this.view !== 'kanji'}>
+      <div id="kanji-results" ?hide=${!this.showKanjiResult}>
+        <p>Kanji Results</p>
         ${kanjiResult.length === 0 ? html`no result` : nothing}
         ${kanjiResult.map(i=>{
           return html`<search-item-element .item=${i} .revealed=${true}></search-item-element>`
@@ -161,6 +175,13 @@ export class JapaneseSearchManager extends LitElement {
           </div>
           `
         })}
+      </div>
+
+      <!-- WORDS RESULT -->
+      <div id="words-results" ?hide=${!this.showWordsResult}>
+        <p>Words Results</p>
+        ${wordsResult.length === 0 ? html`no result` : nothing}
+        ${wordsResult.map(i=>html`<search-item-element .item=${i} .revealed=${!this.blindMode}></search-item-element>`)}
       </div>
 
       <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
@@ -216,7 +237,8 @@ export class JapaneseSearchManager extends LitElement {
               dictionary: `jlpt${5 - n}` as Dictionaries,
               word: r[0],
               english: r[2],
-              hiragana: r[1] || undefined
+              hiragana: r[1] || undefined,
+              exactSearch: r[0] === query
             })
           });
       searchResult.push(...result)
@@ -226,24 +248,57 @@ export class JapaneseSearchManager extends LitElement {
     if (!exactSearch) {
       searchResult.unshift({
         type: 'words',
-        dictionary: 'exact search not found',
+        dictionary: 'not found',
         word:query,
+        exactSearch: true
       })
     }
 
     /** Kanji search */
-    searchResult.push(...
-      (_kanjis as Kanji[])
-        .filter(e=>{
-          return this.query.includes(e[1]) || e[3].includes(this.query) || e[4].includes(this.query)
-        })
-        .map<SearchItem>(i=>({
-          type: 'kanji',
-          dictionary: `jlpt${i[2]}` as Dictionaries,
-          word: i[1],
-          english: `${i[3]}//${i[4]}`
-        }))
-    )
+    if (hasChinese(query)) {
+      // we assume the search is purely kanji-oriented
+      // in that case we search each character
+      for (const character of query.split('')) {
+        if (!hasChinese(character)) {
+          // if the character is not a kanji we ignore
+          continue
+        }
+        const kanji = (_kanjis as Kanji[]).find(k=>k[1]===character)
+        if (kanji) {
+          searchResult.push(this.attachFrequencyValue({
+            type: 'kanji',
+            dictionary: `jlpt${kanji[2]}` as Dictionaries,
+            word: kanji[1],
+            english: `${kanji[3]}//${kanji[4]}`,
+            exactSearch: kanji[1] === query
+          }))
+        }
+        else {
+          // if a kanji was not found we include the result in the list
+          // to be able to access the search information menu
+          searchResult.push({
+            type: 'kanji',
+            dictionary: 'not found',
+            word: character,
+            exactSearch: character === query
+          })
+        }
+      }
+    }
+    else {
+      // we assume the search is purely english-oriented
+      searchResult.push(...
+        (_kanjis as Kanji[])
+          .filter(k=>k[3].includes(query) || k[4].includes(query))
+          .sort(function (k1, k2) { return k2[2] - k1[2] })
+          .map<SearchItem>(kanji=>this.attachFrequencyValue({
+            type: 'kanji',
+            dictionary: `jlpt${kanji[2]}` as Dictionaries,
+            word: kanji[1],
+            english: `${kanji[3]}//${kanji[4]}`
+          }))
+      )
+    }
 
     // if (this.blindMode) {
     //   this.searchItemElements.forEach(e=>e.conceal())
