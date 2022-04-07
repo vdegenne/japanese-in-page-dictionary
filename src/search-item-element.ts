@@ -88,7 +88,7 @@ export class SearchItemElement extends LitElement {
     <div class=header>
       <!-- <mwc-icon-button icon=volume_up style="margin-right:5px;"
         @click=${e=>this.onSpeakerClick(e)}></mwc-icon-button> -->
-      <div class="word" ?exactSearch=${this.item.exactSearch}>
+      <div class="word" ?exactSearch=${this.item.exactSearch} ?notFound=${this.item.dictionary === 'not found'}>
         ${this.item.word.split('').map(c=>{
           const kanjiData = getKanjiData(c)
           return html`<span class=character

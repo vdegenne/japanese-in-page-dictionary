@@ -1347,6 +1347,9 @@ const fi=c`.material-icons{font-family:var(--mdc-icon-font, "Material Icons");fo
 :host .word[exactSearch] {
   background-color: yellow;
 }
+:host .word[notFound] {
+  color: red;
+}
 :host .word .character {
   /* cursor: pointer; */
 }
@@ -1468,7 +1471,7 @@ const fi=c`.material-icons{font-family:var(--mdc-icon-font, "Material Icons");fo
     <div class=header>
       <!-- <mwc-icon-button icon=volume_up style="margin-right:5px;"
         @click=${e=>this.onSpeakerClick(e)}></mwc-icon-button> -->
-      <div class="word" ?exactSearch=${this.item.exactSearch}>
+      <div class="word" ?exactSearch=${this.item.exactSearch} ?notFound=${"not found"===this.item.dictionary}>
         ${this.item.word.split("").map((e=>{const t=(o=e,be.find((e=>e[1]===o)));var o;return F`<span class=character
             title="${t?`(jlpt${t[2]}) ${t[3]}//${t[4]}`:""}"
             @click=${e=>{console.log(this.parentElement)}}>${e}</span>`}))}

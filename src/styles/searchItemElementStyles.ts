@@ -34,6 +34,9 @@ export const searchItemStyles = css`
 :host .word[exactSearch] {
   background-color: yellow;
 }
+:host .word[notFound] {
+  color: red;
+}
 :host .word .character {
   /* cursor: pointer; */
 }
