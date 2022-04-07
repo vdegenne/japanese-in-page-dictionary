@@ -96,16 +96,15 @@ export class SearchItemElement extends LitElement {
             @click=${e=>{console.log(this.parentElement);return;e.target.parentElement.searchManager.search(e.target.innerText.trim());window.searchManager.view='kanji'}}>${c}</span>`
         })}
       </div>
-      ${this.item.hiragana ? html`
-      <concealable-span class=hiragana .concealed=${live(!this.revealed)}>${this.item.hiragana}</concealable-span>` : nothing}
+      ${this.item.hiragana ? html`<concealable-span class=hiragana .concealed=${live(!this.revealed)}>${this.item.hiragana}</concealable-span>` : nothing}
+      ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap}>${this.item.dictionary}</span>` : nothing}
       <div style="flex:1"></div>
       ${this.item.frequency ? html`
       <span class=lemma>${this.item.frequency}</span>
       ` : nothing}
 
       <!-- tag -->
-      <span class=${tagClassMap}
-        @click=${()=>naver(this.item.word)}>${this.item.dictionary}</span>
+      ${this.item.dictionary !== 'not found' ? html`<span class=${tagClassMap}>${this.item.dictionary}</span>` : nothing}
       <!-- three dots menu -->
       <mwc-icon-button icon=more_vert
         @click=${(e)=>{/* simulate right click to open the menu */this.onRightClick(e)}}></mwc-icon-button>
@@ -116,7 +115,7 @@ export class SearchItemElement extends LitElement {
     ${this.item.english ? html`
     <concealable-span class=english .concealed=${live(!this.revealed)}>${this.item.english}</concealable-span>
     ` : html`
-    <span class=english>Click the menu to search on external sites.  </span>
+    <!-- <span class=english>Click the menu to search on external sites.</span> -->
     ` }
 
     `

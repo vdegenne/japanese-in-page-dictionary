@@ -35,7 +35,7 @@ export const searchItemStyles = css`
   background-color: yellow;
 }
 :host .word[notFound] {
-  color: red;
+  /* color: red; */
 }
 :host .word .character {
   /* cursor: pointer; */

@@ -27,12 +27,10 @@ mwc-tab-bar {
 }
 
 #words-results > p, #kanji-results > p {
-  /* font-weight: 600; */
-  background-color: #e0e0e0;
+  background-color: #616161;
   color: white;
-  /* display: inline-block; */
-  padding: 2px 14px;
-  border-radius: 15px;
+  padding: 6px 14px;
+  display: inline-block;
 }
 
 search-item-element {

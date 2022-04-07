@@ -28,6 +28,10 @@ export const sharedStyles = css`
   background-color: black !important;
   color: white !important;
 }
+.jlpt0-color {
+  background-color: #eeeeee !important;
+  color: white !important;
+}
 .not-found {
   /* background-color: transparent; */
   border: 1px solid #f44336;
