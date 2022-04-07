@@ -1,0 +1,37 @@
+{
+  "name": "japanese-inpage-dictionary",
+  "description": "",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [ "<all_urls>"],
+      "js": [ "webcomponents-bundle.js", "content.js" ],
+      "css": ["styles/contentscript.css"]
+    }
+  ],
+  "web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": ["styles/contentscript.css",
+      "fonts/MaterialIcons-Regular.woff2",
+      "fonts/SawarabiMincho-Regular.ttf",
+      "fonts/**",
+      "images/**"
+    ]
+  }],
+  "commands": {
+    "open_inpage_dialog": {
+      "description": "Open the in-page dictionary"
+    }
+  }
+}
