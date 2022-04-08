@@ -7,6 +7,11 @@ export const searchManagerStyles = css`
   position: relative;
   z-index: 9999;
   /* --mdc-theme-surface: white; */
+  --mdc-typography-body1-font-size: 16px;
+  --mdc-typography-body1-line-height: 24px;
+  --mdc-typography-body2-font-size: 14px;
+  --mdc-typography-subtitle1-font-size: 16px;
+  --mdc-typography-button-font-size: 14px;
 }
 mwc-textfield {
   width: 100%;
