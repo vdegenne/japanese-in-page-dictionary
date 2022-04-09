@@ -20,6 +20,9 @@ import { TextField } from '@material/mwc-textfield';
 
 import './search-item-element'
 import './concealable-span'
+import './search-history'
+
+import {SearchHistory} from "./search-history";
 import { ConcealableSpan } from './concealable-span';
 
 import _kanjis from '../data/kanjis.json'
@@ -66,6 +69,11 @@ export type SearchItem = {
 const views = ['words', 'kanji'] as const
 declare type ViewType = typeof views[number];
 declare type SearchHistoryItem = { search: string, view: ViewType };
+declare global {
+  interface Window {
+    searchManager: JapaneseSearchManager;
+  }
+}
 
 @customElement('japanese-search-manager')
 export class JapaneseSearchManager extends LitElement {
@@ -76,7 +84,10 @@ export class JapaneseSearchManager extends LitElement {
   @state() showKanjiResult = true
   @state() showWordsResult = true
 
-  private _searchHistory: SearchHistoryItem[] = [{search: 'test', view: 'words'}]
+  // private _searchCache: {[query:string]: SearchItem[]} = {}
+  // private _searchHistory: SearchHistoryItem[] = [{search: 'test', view: 'words'}]
+  // private _history: SearchHistory = new SearchHistory(this)
+  @query('search-history') _history!: SearchHistory;
 
   @state() blindMode = false
   // private _hideInformationsOnSearchOption = true
@@ -90,6 +101,7 @@ export class JapaneseSearchManager extends LitElement {
 
   constructor () {
     super()
+    window.searchManager = this
     this.addEventListener('click', (e) => {
       const target = e.composedPath()[0] as HTMLSpanElement;
       if (target.hasAttribute('hideInfo')) {
@@ -183,6 +195,8 @@ export class JapaneseSearchManager extends LitElement {
         ${wordsResult.length === 0 ? html`no result` : nothing}
         ${wordsResult.map(i=>html`<search-item-element .item=${i} .revealed=${!this.blindMode}></search-item-element>`)}
       </div>
+        
+        <search-history .searchManager="${this}" slot=secondaryAction></search-history>
 
       <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
         <mwc-checkbox ?checked=${this.blindMode}
@@ -222,6 +236,17 @@ export class JapaneseSearchManager extends LitElement {
       return
     }
     this.query = query
+
+    // push the query in the history object
+    this._history.pushHistory(query)
+
+    // if the search is cached we give the cached version first
+    const cached = this._history.getCachedQuery(query)
+    if (cached) {
+      this.result = cached
+      return
+    }
+
     let searchResult: SearchItem[] = []
 
     /** Words search */
@@ -307,6 +332,10 @@ export class JapaneseSearchManager extends LitElement {
     //   this.searchItemElements.forEach(e=>e.reveal())
     // }
     // should include Lemmas in the search ?
+
+    // cache the result
+    this._history.addToCache(query, searchResult)
+    // finally update the view
     this.result = searchResult
   }
 

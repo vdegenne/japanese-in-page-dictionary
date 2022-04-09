@@ -68,17 +68,17 @@ export class SearchItemElement extends LitElement {
           <span>Jisho</span>
           <img src="chrome-extension://${extension_id}/images/jisho.ico" slot="graphic">
         </mwc-list-item>
-        <mwc-list-item graphic=icon @click=${()=>{tatoeba(this.item.word)}}>
-          <span>Tatoeba</span>
-          <img src="chrome-extension://${extension_id}/images/tatoeba.ico" slot="graphic">
+        <mwc-list-item graphic=icon @click=${()=>{mdbg(this.item.word)}}>
+          <span>MDBG</span>
+          <img src="chrome-extension://${extension_id}/images/mdbg.ico" slot="graphic">
         </mwc-list-item>
         <mwc-list-item graphic=icon @click=${()=>{naver(this.item.word)}}>
           <span>Naver</span>
           <img src="chrome-extension://${extension_id}/images/naver.ico" slot="graphic">
         </mwc-list-item>
-        <mwc-list-item graphic=icon @click=${()=>{mdbg(this.item.word)}}>
-          <span>MDBG</span>
-          <img src="chrome-extension://${extension_id}/images/mdbg.ico" slot="graphic">
+        <mwc-list-item graphic=icon @click=${()=>{tatoeba(this.item.word)}}>
+          <span>Tatoeba</span>
+          <img src="chrome-extension://${extension_id}/images/tatoeba.ico" slot="graphic">
         </mwc-list-item>
       </mwc-menu>
     </div>
@@ -91,13 +91,13 @@ export class SearchItemElement extends LitElement {
       <div class="word" ?exactSearch=${this.item.exactSearch} ?notFound=${this.item.dictionary === 'not found'}>
         ${this.item.word.split('').map(c=>{
           const kanjiData = getKanjiData(c)
-          return html`<span class=character
+          return html`<span class="character"
             title="${kanjiData ? `(jlpt${kanjiData[2]}) ${kanjiData[3]}//${kanjiData[4]}` : ''}"
-            @click=${e=>{console.log(this.parentElement);return;e.target.parentElement.searchManager.search(e.target.innerText.trim());window.searchManager.view='kanji'}}>${c}</span>`
+            @click=${e=>{window.searchManager.search(e.target.innerText.trim());window.searchManager.view='kanji'}}>${c}</span>`
         })}
       </div>
       ${this.item.hiragana ? html`<concealable-span class=hiragana .concealed=${live(!this.revealed)}>${this.item.hiragana}</concealable-span>` : nothing}
-      ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap}>${this.item.dictionary}</span>` : nothing}
+      ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap} style="margin-left:6px">${this.item.dictionary}</span>` : nothing}
       <div style="flex:1"></div>
       ${this.item.frequency ? html`
       <span class=lemma>${this.item.frequency}</span>
