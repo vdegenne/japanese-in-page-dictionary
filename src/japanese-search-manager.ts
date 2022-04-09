@@ -195,7 +195,7 @@ export class JapaneseSearchManager extends LitElement {
         ${wordsResult.length === 0 ? html`no result` : nothing}
         ${wordsResult.map(i=>html`<search-item-element .item=${i} .revealed=${!this.blindMode}></search-item-element>`)}
       </div>
-        
+
         <search-history .searchManager="${this}" slot=secondaryAction></search-history>
 
       <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
@@ -231,14 +231,16 @@ export class JapaneseSearchManager extends LitElement {
 
 
 
-  search (query: string) {
+  search (query: string, pushToHistory = true) {
     if (query === this.query) {
       return
     }
     this.query = query
 
     // push the query in the history object
-    this._history.pushHistory(query)
+    if (pushToHistory) {
+      this._history.pushHistory(query)
+    }
 
     // if the search is cached we give the cached version first
     const cached = this._history.getCachedQuery(query)

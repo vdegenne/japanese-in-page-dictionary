@@ -10,8 +10,10 @@ export const searchManagerStyles = css`
   --mdc-typography-body1-font-size: 16px;
   --mdc-typography-body1-line-height: 24px;
   --mdc-typography-body2-font-size: 14px;
+  --mdc-typography-body2-line-height: 20px;
   --mdc-typography-subtitle1-font-size: 16px;
   --mdc-typography-button-font-size: 14px;
+  --mdc-menu-item-height: 38px;
 }
 mwc-textfield {
   width: 100%;

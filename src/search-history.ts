@@ -39,8 +39,8 @@ export class SearchHistory extends LitElement {
   }
 
   pushHistory (query: string) {
+    this.index = this._history.length;
     this._history.push(query)
-    this.index++;
   }
 
   back() {
@@ -48,7 +48,7 @@ export class SearchHistory extends LitElement {
       return; // can't go back because we are at the bottom of the list
     }
     this.index--
-    this.searchManager.result = this._cached[this._history[this.index]]
+    this.searchManager.search(this._history[this.index], false)
   }
 
   forward () {
@@ -56,6 +56,6 @@ export class SearchHistory extends LitElement {
       return; // can't go forward because we are at the top of the list
     }
     this.index++;
-    this.searchManager.result = this._cached[this._history[this.index]]
+    this.searchManager.search(this._history[this.index], false)
   }
 }

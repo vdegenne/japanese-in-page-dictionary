@@ -48,7 +48,7 @@ export class SearchItemElement extends LitElement {
     -->
     <div id=anchor>
       <!-- MENU -->
-      <mwc-menu>
+      <mwc-menu fixed>
         <mwc-list-item noninteractive>
           <span style="font-family:'Sawarabi Mincho'">${this.item.word}</span>
         </mwc-list-item>
@@ -56,7 +56,7 @@ export class SearchItemElement extends LitElement {
         <!-- google images -->
         <mwc-list-item graphic=icon @click=${()=>{googleImageSearch(this.item.word)}}>
           <span>Google Images</span>
-          <mwc-icon slot=graphic>images</mwc-icon>
+          <mwc-icon slot=graphic style="color:#2196f3">images</mwc-icon>
         </mwc-list-item>
         <!-- listen -->
         <mwc-list-item graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
