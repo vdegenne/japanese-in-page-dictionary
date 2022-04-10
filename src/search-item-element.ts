@@ -12,6 +12,7 @@ import './concealable-span'
 import { Menu } from '@material/mwc-menu';
 import { ConcealableSpan } from './concealable-span';
 import { sharedStyles } from './styles/sharedStyles';
+import { ListItem } from '@material/mwc-list/mwc-list-item';
 
 // @ts-ignore
 const extension_id = chrome.runtime.id
@@ -24,6 +25,10 @@ export class SearchItemElement extends LitElement {
 
   @query('#anchor') anchor!: HTMLDivElement;
   @query('mwc-menu') menu!: Menu;
+  @query('mwc-list-item#google-images') googleImagesListItem!: ListItem;
+  @query('mwc-list-item#jisho') jishoListItem!: ListItem;
+  @query('mwc-list-item#mdbg') mdbgListItem!: ListItem;
+  @query('mwc-list-item#listen') listenListItem!: ListItem;
   @queryAll('concealable-span') concealableSpans!: ConcealableSpan[];
   @queryAll('concealable-span[concealed]') concealedSpans!: ConcealableSpan[];
 
@@ -54,21 +59,16 @@ export class SearchItemElement extends LitElement {
         </mwc-list-item>
         <li divider role="separator"></li>
         <!-- google images -->
-        <mwc-list-item graphic=icon @click=${()=>{googleImageSearch(this.item.word)}}>
+        <mwc-list-item id="google-images" graphic=icon @click=${()=>{googleImageSearch(this.item.word)}}>
           <span>Google Images</span>
           <mwc-icon slot=graphic style="color:#2196f3">images</mwc-icon>
         </mwc-list-item>
-        <!-- listen -->
-        <mwc-list-item graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
-          <span>Listen</span>
-          <mwc-icon slot=graphic>volume_up</mwc-icon>
-        </mwc-list-item>
         <!-- jisho -->
-        <mwc-list-item graphic=icon @click=${()=>{jisho(this.item.word)}}>
+        <mwc-list-item id="jisho" graphic=icon @click=${()=>{jisho(this.item.word)}}>
           <span>Jisho</span>
           <img src="chrome-extension://${extension_id}/images/jisho.ico" slot="graphic">
         </mwc-list-item>
-        <mwc-list-item graphic=icon @click=${()=>{mdbg(this.item.word)}}>
+        <mwc-list-item id="mdbg" graphic=icon @click=${()=>{mdbg(this.item.word)}}>
           <span>MDBG</span>
           <img src="chrome-extension://${extension_id}/images/mdbg.ico" slot="graphic">
         </mwc-list-item>
@@ -79,6 +79,12 @@ export class SearchItemElement extends LitElement {
         <mwc-list-item graphic=icon @click=${()=>{tatoeba(this.item.word)}}>
           <span>Tatoeba</span>
           <img src="chrome-extension://${extension_id}/images/tatoeba.ico" slot="graphic">
+        </mwc-list-item>
+        <li divider role="separator" padded></li>
+        <!-- listen -->
+        <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
+          <span>Listen</span>
+          <mwc-icon slot=graphic>volume_up</mwc-icon>
         </mwc-list-item>
       </mwc-menu>
     </div>
@@ -130,6 +136,18 @@ export class SearchItemElement extends LitElement {
       if (e.button === 2) {
         document.body.click() // close all others menu
         this.onRightClick(e)
+      }
+    })
+
+
+    this.addEventListener('keypress', (e)=>{
+      if (this.menu.open) {
+        if (e.key == 'a') {
+          this.googleImagesListItem.click()
+        }
+        if (e.key=='s') {
+          this.listenListItem.click()
+        }
       }
     })
   }

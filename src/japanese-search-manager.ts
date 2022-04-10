@@ -133,7 +133,7 @@ export class JapaneseSearchManager extends LitElement {
 
     // console.log(this.query)
     return html`
-    <mwc-dialog style="--mdc-dialog-min-width:calc(100vw - 32px);">
+    <mwc-dialog style="/*--mdc-dialog-min-width:calc(100vw - 32px);*/">
       <!-- <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
           activeIndex=${views.indexOf(this.view)}>
