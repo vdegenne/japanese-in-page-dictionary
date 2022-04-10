@@ -148,6 +148,12 @@ export class SearchItemElement extends LitElement {
         if (e.key=='s') {
           this.listenListItem.click()
         }
+        if (e.key=='g') {
+          this.jishoListItem.click()
+        }
+        if (e.key=='h') {
+          this.mdbgListItem.click()
+        }
       }
     })
   }
