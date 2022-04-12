@@ -28,6 +28,7 @@ export class SearchItemElement extends LitElement {
   @query('mwc-list-item#google-images') googleImagesListItem!: ListItem;
   @query('mwc-list-item#jisho') jishoListItem!: ListItem;
   @query('mwc-list-item#mdbg') mdbgListItem!: ListItem;
+  @query('mwc-list-item#naver') naverListItem!: ListItem;
   @query('mwc-list-item#listen') listenListItem!: ListItem;
   @queryAll('concealable-span') concealableSpans!: ConcealableSpan[];
   @queryAll('concealable-span[concealed]') concealedSpans!: ConcealableSpan[];
@@ -72,7 +73,7 @@ export class SearchItemElement extends LitElement {
           <span>MDBG</span>
           <img src="chrome-extension://${extension_id}/images/mdbg.ico" slot="graphic">
         </mwc-list-item>
-        <mwc-list-item graphic=icon @click=${()=>{naver(this.item.word)}}>
+        <mwc-list-item id="naver" graphic=icon @click=${()=>{naver(this.item.word)}}>
           <span>Naver</span>
           <img src="chrome-extension://${extension_id}/images/naver.ico" slot="graphic">
         </mwc-list-item>
@@ -153,6 +154,9 @@ export class SearchItemElement extends LitElement {
         }
         if (e.key=='h') {
           this.mdbgListItem.click()
+        }
+        if (e.key=='n') {
+          this.naverListItem.click()
         }
       }
     })
