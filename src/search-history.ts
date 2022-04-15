@@ -1,15 +1,15 @@
 import {html, LitElement, nothing} from "lit";
 import {customElement, state} from "lit/decorators.js";
-import {JapaneseSearchManager, SearchItem} from "./japanese-search-manager";
+import {SearchManager, SearchItem} from "./search-manager";
 
 @customElement('search-history')
 export class SearchHistory extends LitElement {
-  private searchManager: JapaneseSearchManager;
+  private searchManager: SearchManager;
   private _cached: {[query: string]: SearchItem[]} = {};
   private _history: string[] = []
   @state() private index = -1;
 
-  constructor(searchManager: JapaneseSearchManager) {
+  constructor(searchManager: SearchManager) {
     super();
     this.searchManager = searchManager;
   }

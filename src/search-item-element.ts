@@ -4,7 +4,7 @@ import {classMap} from 'lit/directives/class-map.js'
 import {live} from 'lit/directives/live.js'
 import { searchItemStyles } from './styles/searchItemElementStyles';
 import { getKanjiData, googleImageSearch, jisho, mdbg, naver, playJapaneseAudio, tatoeba } from './util';
-import {SearchItem} from './japanese-search-manager'
+import {SearchItem} from './search-manager'
 
 import '@material/mwc-menu'
 

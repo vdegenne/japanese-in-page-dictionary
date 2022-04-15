@@ -1,7 +1,7 @@
-import './japanese-search-manager'
+import './search-manager'
 
 window.onload = function () {
-  const div = document.createElement('japanese-search-manager')
+  const div = document.createElement('search-manager')
   // div.innerText = 'bonjour'
 
   document.body.prepend(div)

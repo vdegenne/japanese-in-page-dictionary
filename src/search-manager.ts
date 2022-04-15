@@ -71,12 +71,12 @@ declare type ViewType = typeof views[number];
 declare type SearchHistoryItem = { search: string, view: ViewType };
 declare global {
   interface Window {
-    searchManager: JapaneseSearchManager;
+    searchManager: SearchManager;
   }
 }
 
-@customElement('japanese-search-manager')
-export class JapaneseSearchManager extends LitElement {
+@customElement('search-manager')
+export class SearchManager extends LitElement {
   @state() view: ViewType = 'words';
   @state() query: string = '';
   @state() result: SearchItem[] = []
