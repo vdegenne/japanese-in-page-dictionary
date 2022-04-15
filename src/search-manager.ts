@@ -81,7 +81,7 @@ export class SearchManager extends LitElement {
   @state() query: string = '';
   @state() result: SearchItem[] = []
 
-  @state() showKanjiResult = true
+  @state() showKanjiResult = false
   @state() showWordsResult = true
 
   // private _searchCache: {[query:string]: SearchItem[]} = {}

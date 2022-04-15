@@ -8,7 +8,7 @@ chrome.commands.onCommand.addListener(async (command) => {
         target: { tabId: currentTab.id },
         func: async function () {
           const selection = document.getSelection().toString()
-          const searchManager = document.querySelector('japanese-search-manager')
+          const searchManager = document.querySelector('search-manager')
           if (selection) {
             searchManager.open(selection)
           }
