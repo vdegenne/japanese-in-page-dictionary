@@ -10,10 +10,10 @@ chrome.commands.onCommand.addListener(async (command) => {
           const selection = document.getSelection().toString()
           const searchManager = document.querySelector('search-manager')
           if (selection) {
-            searchManager.open(selection)
+            searchManager.show(selection)
           }
           else {
-            searchManager.open()
+            searchManager.show()
           }
         }
       })

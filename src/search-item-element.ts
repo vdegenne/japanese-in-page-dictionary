@@ -4,24 +4,27 @@ import {classMap} from 'lit/directives/class-map.js'
 import {live} from 'lit/directives/live.js'
 import { searchItemStyles } from './styles/searchItemElementStyles';
 import { getKanjiData, googleImageSearch, jisho, mdbg, naver, playJapaneseAudio, tatoeba } from './util';
-import {SearchItem} from './search-manager'
+import {SearchItem, SearchManager} from './search-manager'
 
 import '@material/mwc-menu'
+import { ListItem } from '@material/mwc-list/mwc-list-item';
 
 import './concealable-span'
 import { Menu } from '@material/mwc-menu';
 import { ConcealableSpan } from './concealable-span';
 import { sharedStyles } from './styles/sharedStyles';
-import { ListItem } from '@material/mwc-list/mwc-list-item';
 
 // @ts-ignore
 const extension_id = chrome.runtime.id
+
 
 @customElement('search-item-element')
 export class SearchItemElement extends LitElement {
   @property({type: Object }) item!: SearchItem;
 
   @state() revealed: boolean = false;
+
+  private searchManager!: SearchManager;
 
   @query('#anchor') anchor!: HTMLDivElement;
   @query('mwc-menu') menu!: Menu;
@@ -54,7 +57,7 @@ export class SearchItemElement extends LitElement {
     -->
     <div id=anchor>
       <!-- MENU -->
-      <mwc-menu fixed>
+      <mwc-menu quick fixed @click=${(e)=>{this.menu.show()}}>
         <mwc-list-item noninteractive>
           <span style="font-family:'Sawarabi Mincho'">${this.item.word}</span>
         </mwc-list-item>
@@ -77,11 +80,11 @@ export class SearchItemElement extends LitElement {
           <span>Naver</span>
           <img src="chrome-extension://${extension_id}/images/naver.ico" slot="graphic">
         </mwc-list-item>
-        <mwc-list-item graphic=icon @click=${()=>{tatoeba(this.item.word)}}>
+        <mwc-list-item id="tatoeba" graphic=icon @click=${()=>{tatoeba(this.item.word)}}>
           <span>Tatoeba</span>
           <img src="chrome-extension://${extension_id}/images/tatoeba.ico" slot="graphic">
         </mwc-list-item>
-        <li divider role="separator" padded></li>
+        <li divider role=separator padded></li>
         <!-- listen -->
         <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
           <span>Listen</span>
@@ -95,16 +98,19 @@ export class SearchItemElement extends LitElement {
     <div class=header>
       <!-- <mwc-icon-button icon=volume_up style="margin-right:5px;"
         @click=${e=>this.onSpeakerClick(e)}></mwc-icon-button> -->
-      <div class="word" ?exactSearch=${this.item.exactSearch} ?notFound=${this.item.dictionary === 'not found'}>
+      <div class="word" ?highlight=${this.item.exactSearch} ?notFound=${this.item.dictionary === 'not found'}>
         ${this.item.word.split('').map(c=>{
           const kanjiData = getKanjiData(c)
           return html`<span class="character"
             title="${kanjiData ? `(jlpt${kanjiData[2]}) ${kanjiData[3]}//${kanjiData[4]}` : ''}"
-            @click=${e=>{window.searchManager.search(e.target.innerText.trim());window.searchManager.view='kanji'}}>${c}</span>`
+            @click=${e=>{this.searchManager.show(e.target.innerText.trim(), 'kanji')}}>${c}</span>`
         })}
       </div>
-      ${this.item.hiragana ? html`<concealable-span class=hiragana .concealed=${live(!this.revealed)}>${this.item.hiragana}</concealable-span>` : nothing}
-      ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap} style="margin-left:6px">${this.item.dictionary}</span>` : nothing}
+      ${this.item.hiragana ? html`
+          <concealable-span class=hiragana .concealed=${live(!this.revealed)}
+          ?highlight=${this.item.hiragana == this.searchManager.query}>${this.item.hiragana}</concealable-span>
+      ` : nothing}
+      ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap} style="margin-left:6px">exact search</span>` : nothing}
       <div style="flex:1"></div>
       ${this.item.frequency ? html`
       <span class=lemma>${this.item.frequency}</span>
@@ -133,17 +139,31 @@ export class SearchItemElement extends LitElement {
 
     this.menu.anchor = this.anchor
 
-    this.addEventListener('pointerdown', (e)=>{
+    this.addEventListener('pointerdown', async e => {
       if (e.button === 2) {
         document.body.click() // close all others menu
         this.onRightClick(e)
+        // click on the menu to give keyboard focus
+        // this.menu.dispatchEvent(new MouseEvent('click', {button: 0, bubbles: true, composed: true}))
+        // this.menu.blur()
+        //
+        // this.blur()
+        // setTimeout(()=>(this.shadowRoot!.querySelector('[noninteractive]') as ListItem).click(), 300)
+        // document.activeElement = this.menu
+        // await this.menu.updateComplete
+        // this.menu.listElement_.focus()
+        // @ts-ignore
+        setTimeout(()=>this.menu.listElement_.focus(), 0)
+        // this.menu.focus()
       }
     })
 
 
-    this.addEventListener('keypress', (e)=>{
+    this.menu.addEventListener('keypress', (e)=>{
       if (this.menu.open) {
-        if (e.key == 'a') {
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        if (e.code=='KeyA') {
           this.googleImagesListItem.click()
         }
         if (e.key=='s') {
@@ -181,6 +201,7 @@ export class SearchItemElement extends LitElement {
     // Move the anchor to the pointer position
     this.moveAnchorTo(x, y)
     this.menu.show()
+    // setTimeout(()=>this.menu.show(), 0)
 
     // Open the menu
   }

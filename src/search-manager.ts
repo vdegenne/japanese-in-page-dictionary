@@ -34,7 +34,7 @@ import jlpt1 from '../data/jlpt1-words.json'
 import { sharedStyles } from './styles/sharedStyles';
 import { Menu } from '@material/mwc-menu';
 import { SearchItemElement } from './search-item-element';
-const jlpts: JlptWordEntry[][] = [
+export const jlpts: JlptWordEntry[][] = [
   jlpt5 as JlptWordEntry[],
   // [],
 
@@ -81,7 +81,7 @@ export class SearchManager extends LitElement {
   @state() query: string = '';
   @state() result: SearchItem[] = []
 
-  @state() showKanjiResult = false
+  @state() showKanjiResult = true
   @state() showWordsResult = true
 
   // private _searchCache: {[query:string]: SearchItem[]} = {}
@@ -112,8 +112,8 @@ export class SearchManager extends LitElement {
       this.requestUpdate()
     })
 
-    this.addEventListener('keydown', e=>{
-      // e.stopImmediatePropagation()
+    this.addEventListener('keypress', e=>{
+      e.stopImmediatePropagation()
       e.stopPropagation()
       // e.preventDefault()
       e.cancelBubble  = true
@@ -143,11 +143,43 @@ export class SearchManager extends LitElement {
 
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
-        <mwc-textfield .value=${this.query}
-          @keypress=${e=>{if (e.key === 'Enter') {this.search(this.textfield.value)}}}
-          iconTrailing=close></mwc-textfield>
-        <mwc-icon-button icon=close style="position:absolute;top:4px;right:4px;"
-          @click=${()=>{this.query='';this.textfield.value = '';this.textfield.focus()}}></mwc-icon-button>
+          <div style="position:relative;flex:1">
+              <mwc-textfield .value=${this.query}
+                             @keypress=${e => {
+                                 if (e.key === 'Enter') {
+                                     this.search(this.textfield.value)
+                                 }
+                             }}
+                             iconTrailing=close></mwc-textfield>
+              <mwc-icon-button icon=close style="position:absolute;top:4px;right:4px;"
+                               @click=${() => {
+                                   this.query = '';
+                                   this.textfield.value = '';
+                                   this.textfield.focus()
+                               }}></mwc-icon-button>
+          </div>
+
+          <div style="position: relative">
+            <mwc-icon-button icon="casino" @click=${(e)=>{this.onCasinoButtonClick(e)}}></mwc-icon-button>
+            <mwc-menu fixed
+                    @action=${(e)=>{this.onMenuListItemAction(e)}}>
+                <mwc-list-item>
+                    <span>jlpt5</span>
+                </mwc-list-item>
+                <mwc-list-item>
+                    <span>jlpt4</span>
+                </mwc-list-item>
+                <mwc-list-item>
+                    <span>jlpt3</span>
+                </mwc-list-item>
+                <mwc-list-item>
+                    <span>jlpt2</span>
+                </mwc-list-item>
+                <mwc-list-item>
+                    <span>jlpt1</span>
+                </mwc-list-item>
+            </mwc-menu>
+          </div>
       </div>
       <!-- choice checkboxes -->
       <div>
@@ -169,7 +201,7 @@ export class SearchManager extends LitElement {
         <p>Kanji Results</p>
         ${kanjiResult.length === 0 ? html`no result` : nothing}
         ${kanjiResult.map(i=>{
-          return html`<search-item-element .item=${i} .revealed=${true}></search-item-element>`
+          return html`<search-item-element .item=${i} .searchManager=${this} .revealed=${true}></search-item-element>`
           return html`
           <div class=item>
             <div style="display:flex;justify-content:space-between;margin:12px 0 5px 0;">
@@ -193,7 +225,7 @@ export class SearchManager extends LitElement {
       <div id="words-results" ?hide=${!this.showWordsResult}>
         <p>Words Results</p>
         ${wordsResult.length === 0 ? html`no result` : nothing}
-        ${wordsResult.map(i=>html`<search-item-element .item=${i} .revealed=${!this.blindMode}></search-item-element>`)}
+        ${wordsResult.map(i=>html`<search-item-element .item=${i} .searchManager=${this} .revealed=${!this.blindMode}></search-item-element>`)}
       </div>
 
         <search-history .searchManager="${this}" slot=secondaryAction></search-history>
@@ -230,7 +262,6 @@ export class SearchManager extends LitElement {
   }
 
 
-
   search (query: string, pushToHistory = true) {
     if (query === this.query) {
       return
@@ -242,103 +273,116 @@ export class SearchManager extends LitElement {
       this._history.pushHistory(query)
     }
 
-    // if the search is cached we give the cached version first
+    this.result = this.searchData(query)
+  }
+
+  public searchData (query: string, types = ['words', 'kanji']) {
+    /**
+     * If the search is cached we give the cached version first
+     */
     const cached = this._history.getCachedQuery(query)
     if (cached) {
-      this.result = cached
-      return
+      return (
+        types.includes('words') && types.includes('kanji')
+        ? cached
+        : cached.filter(c=>types.includes(c.type))
+      )
     }
 
     let searchResult: SearchItem[] = []
 
     /** Words search */
-    jlpts.forEach((entries, n) => {
-      const result: SearchItem[] =
-        jlpts[n]
-          .filter(e=>{
-            return e[0].includes(this.query!) || e[2].includes(this.query!)
-          })
-          .map(r=>{
-            return this.attachFrequencyValue({
-              type: 'words',
-              dictionary: `jlpt${5 - n}` as Dictionaries,
-              word: r[0],
-              english: r[2],
-              hiragana: r[1] || undefined,
-              exactSearch: r[0] === query
+    if (types.includes('words')) {
+      jlpts.forEach((entries, n) => {
+        const result: SearchItem[] =
+          jlpts[n]
+            .filter(e => {
+              return e[0].includes(query!)
+                || (e[1] && e[1].includes(query!))
+                || e[2].includes(query!)
             })
-          });
-      searchResult.push(...result)
-    });
-    // add the exact search if not found
-    const exactSearch = searchResult.find(i=>i.word===query);
-    if (!exactSearch) {
-      searchResult.unshift({
-        type: 'words',
-        dictionary: 'not found',
-        word:query,
-        exactSearch: true
-      })
+            .map(r => {
+              return this.attachFrequencyValue({
+                type: 'words',
+                dictionary: `jlpt${5 - n}` as Dictionaries,
+                word: r[0],
+                english: r[2],
+                hiragana: r[1] || undefined,
+                exactSearch: r[0] === query
+              })
+            });
+        searchResult.push(...result)
+      });
+      // add the exact search if not found
+      const exactSearch = searchResult.find(i => i.word === query);
+      if (!exactSearch) {
+        searchResult.unshift({
+          type: 'words',
+          dictionary: 'not found',
+          word: query,
+          exactSearch: true
+        })
+      }
     }
 
     /** Kanji search */
-    if (hasChinese(query)) {
-      // we assume the search is purely kanji-oriented
-      // in that case we search each character
-      for (const character of query.split('')) {
-        if (!hasChinese(character)) {
-          // if the character is not a kanji we ignore
-          continue
+    if (types.includes('kanji')) {
+      if (hasChinese(query)) {
+        // we assume the search is purely kanji-oriented
+        // in that case we search each character
+        for (const character of query.split('')) {
+          if (!hasChinese(character)) {
+            // if the character is not a kanji we ignore
+            continue
+          }
+          const kanji = (_kanjis as Kanji[]).find(k => k[1] === character)
+          if (kanji) {
+            searchResult.push(this.attachFrequencyValue({
+              type: 'kanji',
+              dictionary: `jlpt${kanji[2]}` as Dictionaries,
+              word: kanji[1],
+              english: `${kanji[3]}//${kanji[4]}`,
+              exactSearch: kanji[1] === query
+            }))
+          } else {
+            // if a kanji was not found we include the result in the list
+            // to be able to access the search information menu
+            searchResult.push({
+              type: 'kanji',
+              dictionary: 'not found',
+              word: character,
+              exactSearch: character === query
+            })
+          }
         }
-        const kanji = (_kanjis as Kanji[]).find(k=>k[1]===character)
-        if (kanji) {
-          searchResult.push(this.attachFrequencyValue({
-            type: 'kanji',
-            dictionary: `jlpt${kanji[2]}` as Dictionaries,
-            word: kanji[1],
-            english: `${kanji[3]}//${kanji[4]}`,
-            exactSearch: kanji[1] === query
-          }))
-        }
-        else {
-          // if a kanji was not found we include the result in the list
-          // to be able to access the search information menu
-          searchResult.push({
-            type: 'kanji',
-            dictionary: 'not found',
-            word: character,
-            exactSearch: character === query
-          })
-        }
+      } else {
+        // we assume the search is purely english-oriented
+        searchResult.push(...
+          (_kanjis as Kanji[])
+            .filter(k => k[3].includes(query) || k[4].includes(query))
+            .sort(function (k1, k2) {
+              return k2[2] - k1[2]
+            })
+            .map<SearchItem>(kanji => this.attachFrequencyValue({
+              type: 'kanji',
+              dictionary: `jlpt${kanji[2]}` as Dictionaries,
+              word: kanji[1],
+              english: `${kanji[3]}//${kanji[4]}`
+            }))
+        )
       }
     }
-    else {
-      // we assume the search is purely english-oriented
-      searchResult.push(...
-        (_kanjis as Kanji[])
-          .filter(k=>k[3].includes(query) || k[4].includes(query))
-          .sort(function (k1, k2) { return k2[2] - k1[2] })
-          .map<SearchItem>(kanji=>this.attachFrequencyValue({
-            type: 'kanji',
-            dictionary: `jlpt${kanji[2]}` as Dictionaries,
-            word: kanji[1],
-            english: `${kanji[3]}//${kanji[4]}`
-          }))
-      )
+
+
+    /**
+     * Caching the result for later use
+     * (we do not add to cache if the search is not a fullsearch)
+     */
+    if (types.includes('kanji') && types.includes('words')) {
+      this._history.addToCache(query, searchResult)
     }
 
-    // if (this.blindMode) {
-    //   this.searchItemElements.forEach(e=>e.conceal())
-    // }
-    // else {
-    //   this.searchItemElements.forEach(e=>e.reveal())
-    // }
-    // should include Lemmas in the search ?
-
-    // cache the result
-    this._history.addToCache(query, searchResult)
-    // finally update the view
-    this.result = searchResult
+    return searchResult
   }
 
   attachFrequencyValue (item: SearchItem) {
@@ -359,7 +403,7 @@ export class SearchManager extends LitElement {
     // }
   }
 
-  open(query?: string, view?: ViewType) {
+  show(query?: string, view?: ViewType) {
     if (query) {
       this.search(query)
     }
@@ -369,16 +413,53 @@ export class SearchManager extends LitElement {
     this.dialog.show()
   }
 
+  get open () {
+    return this.dialog.open
+  }
 
+  close () {
+    this.dialog.close()
+  }
+
+  private onCasinoButtonClick(e) {
+    const button = e.target
+    const menu = button.nextElementSibling
+    menu.anchor = button
+    menu.show()
+    // this.open()
+  }
+
+  private onMenuListItemAction(e) {
+    // const jlpt = 5 - e.detail.index
+    // const candidates = jlpts[e.detail.index]
+    // const random = candidates[~~(Math.random()*candidates.length)]
+    // this.show(random[0], 'words')
+    this.show(getRandomWord([5 - e.detail.index])[0])
+  }
 }
 
+export function getRandomWord (jlptsArray = [5, 4, 3, 2, 1]) {
+  const allWords = jlptsArray.map(jlpt => jlpts[5 - jlpt]).flat()
+  return allWords[~~(Math.random()*allWords.length)]
+}
 
-export function firstWordFoundFromCharacter (character: string) {
-  for (const jlpt of jlpts) {
-    const result = jlpt.find(w=>w[0].includes(character))
-    if (result) {
-      return result
+export function getExactSearch (word: string) {
+  for (const wordEntry of jlpts.flat()) {
+    if (wordEntry[0]==word || wordEntry[1]==word) {
+      return wordEntry
     }
   }
-  return null
 }
+export function wordExists(word: string) {
+  return getExactSearch(word) !== undefined
+}
+
+// export function firstWordFoundFromCharacter (character: string) {
+//   for (const jlpt of jlpts) {
+//     const result = jlpt.find(w=>w[0].includes(character))
+//     if (result) {
+//       return result
+//     }
+//   }
+//   return null
+// }
