@@ -274,6 +274,9 @@ export class SearchManager extends LitElement {
     }
 
     this.result = this.searchData(query)
+
+    // blur the textfield
+    this.textfield.blur()
   }
 
   public searchData (query: string, types = ['words', 'kanji']) {
