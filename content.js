@@ -121,10 +121,12 @@ mwc-tab-bar {
 }
 
 #words-results > p, #kanji-results > p {
-  background-color: #616161;
-  color: white;
-  padding: 6px 14px;
+  background-color: #4a148c;
+  color: rgb(250, 250, 250);
+  padding: 3px 10px;
   display: inline-block;
+  border-radius: 3px;
+  margin: 35px 0 32px 10px;
 }
 
 search-item-element {
@@ -1539,7 +1541,7 @@ const pi=c`.material-icons{font-family:var(--mdc-icon-font, "Material Icons");fo
                                @click=${()=>{this.query="",this.textfield.value="",this.textfield.focus()}}></mwc-icon-button>
           </div>
 
-          <div style="position: relative">
+          <!-- <div style="position: relative">
             <mwc-icon-button icon="casino" @click=${e=>{this.onCasinoButtonClick(e)}}></mwc-icon-button>
             <mwc-menu fixed
                     @action=${e=>{this.onMenuListItemAction(e)}}>
@@ -1559,7 +1561,7 @@ const pi=c`.material-icons{font-family:var(--mdc-icon-font, "Material Icons");fo
                     <span>jlpt1</span>
                 </mwc-list-item>
             </mwc-menu>
-          </div>
+          </div> -->
       </div>
       <!-- choice checkboxes -->
       <div>
@@ -1598,4 +1600,4 @@ const pi=c`.material-icons{font-family:var(--mdc-icon-font, "Material Icons");fo
       </mwc-formfield>
       <mwc-button outlined slot="secondaryAction" dialogAction="close">close</mwc-button>
     </mwc-dialog>
-    `}async updated(){await Promise.all([...this.searchItemElements].map((e=>e.updateComplete)))}firstUpdated(e){const t=()=>{this.dialog.shadowRoot.querySelector(".mdc-dialog__surface").style.minHeight="calc(100% - 32px)",this.dialog.removeEventListener("opened",t)};this.dialog.addEventListener("opened",t),this.textfield.updateComplete.then((()=>{this.textfield.shadowRoot.querySelector("i").style.color="transparent"}))}search(e,t=!0){e!==this.query&&(this.query=e,t&&this._history.pushHistory(e),this.result=this.searchData(e),this.textfield.blur())}searchData(e,t=["words","kanji"]){const o=this._history.getCachedQuery(e);if(o)return t.includes("words")&&t.includes("kanji")?o:o.filter((e=>t.includes(e.type)));let r=[];if(t.includes("words")){wi.forEach(((t,o)=>{const i=wi[o].filter((t=>t[0].includes(e)||t[1]&&t[1].includes(e)||t[2].includes(e))).map((t=>this.attachFrequencyValue({type:"words",dictionary:"jlpt"+(5-o),word:t[0],english:t[2],hiragana:t[1]||void 0,exactSearch:t[0]===e})));r.push(...i)}));const t=r.find((t=>t.word===e));t||r.unshift({type:"words",dictionary:"not found",word:e,exactSearch:!0})}if(t.includes("kanji"))if(xe(e))for(const t of e.split("")){if(!xe(t))continue;const o=ye.find((e=>e[1]===t));o?r.push(this.attachFrequencyValue({type:"kanji",dictionary:`jlpt${o[2]}`,word:o[1],english:`${o[3]}//${o[4]}`,exactSearch:o[1]===e})):r.push({type:"kanji",dictionary:"not found",word:t,exactSearch:t===e})}else r.push(...ye.filter((t=>t[3].includes(e)||t[4].includes(e))).sort((function(e,t){return t[2]-e[2]})).map((e=>this.attachFrequencyValue({type:"kanji",dictionary:`jlpt${e[2]}`,word:e[1],english:`${e[3]}//${e[4]}`}))));return t.includes("kanji")&&t.includes("words")&&this._history.addToCache(e,r),r}attachFrequencyValue(e){const t=me.find((t=>t.l===e.word));return t&&(e.frequency=t.f),e}toggleBlindMode(){this.blindMode=!this.blindMode}show(e,t){e&&this.search(e),t&&(this.view=t),this.dialog.show()}get open(){return this.dialog.open}close(){this.dialog.close()}onCasinoButtonClick(e){const t=e.target,o=t.nextElementSibling;o.anchor=t,o.show()}onMenuListItemAction(e){this.show(function(e=[5,4,3,2,1]){const t=e.map((e=>wi[5-e])).flat();return t[~~(Math.random()*t.length)]}([5-e.detail.index])[0])}};xi.styles=[ge,gi],r([ne()],xi.prototype,"view",void 0),r([ne()],xi.prototype,"query",void 0),r([ne()],xi.prototype,"result",void 0),r([ne()],xi.prototype,"showKanjiResult",void 0),r([ne()],xi.prototype,"showWordsResult",void 0),r([ce("search-history")],xi.prototype,"_history",void 0),r([ne()],xi.prototype,"blindMode",void 0),r([ce("mwc-dialog")],xi.prototype,"dialog",void 0),r([ce("mwc-textfield")],xi.prototype,"textfield",void 0),r([fe("#words-results search-item-element")],xi.prototype,"searchItemElements",void 0),xi=r([re("search-manager")],xi),window.onload=function(){const e=document.createElement("search-manager");document.body.prepend(e)}}();
+    `}async updated(){await Promise.all([...this.searchItemElements].map((e=>e.updateComplete)))}firstUpdated(e){const t=()=>{this.dialog.shadowRoot.querySelector(".mdc-dialog__surface").style.minHeight="calc(100% - 32px)",this.dialog.removeEventListener("opened",t)};this.dialog.addEventListener("opened",t),this.textfield.updateComplete.then((()=>{this.textfield.shadowRoot.querySelector("i").style.color="transparent"}))}search(e,t=!0){e!==this.query&&(this.query=e,t&&this._history.pushHistory(e),this.result=this.searchData(e),this.textfield.blur())}searchData(e,t=["words","kanji"]){const o=this._history.getCachedQuery(e);if(o)return t.includes("words")&&t.includes("kanji")?o:o.filter((e=>t.includes(e.type)));let r=[];if(t.includes("words")){wi.forEach(((t,o)=>{const i=wi[o].filter((t=>t[0].includes(e)||t[1]&&t[1].includes(e)||t[2].includes(e))).map((t=>this.attachFrequencyValue({type:"words",dictionary:"jlpt"+(5-o),word:t[0],english:t[2],hiragana:t[1]||void 0,exactSearch:t[0]===e})));r.push(...i)}));const t=r.find((t=>t.word===e));t||r.unshift({type:"words",dictionary:"not found",word:e,exactSearch:!0})}if(t.includes("kanji"))if(xe(e))for(const t of e.split("")){if(!xe(t))continue;const o=ye.find((e=>e[1]===t));o?r.push(this.attachFrequencyValue({type:"kanji",dictionary:`jlpt${o[2]}`,word:o[1],english:`${o[3]}//${o[4]}`,exactSearch:o[1]===e})):r.push({type:"kanji",dictionary:"not found",word:t,exactSearch:t===e})}else r.push(...ye.filter((t=>t[3].includes(e)||t[4].includes(e))).sort((function(e,t){return t[2]-e[2]})).map((e=>this.attachFrequencyValue({type:"kanji",dictionary:`jlpt${e[2]}`,word:e[1],english:`${e[3]}//${e[4]}`}))));return t.includes("kanji")&&t.includes("words")&&this._history.addToCache(e,r),r}attachFrequencyValue(e){const t=me.find((t=>t.l===e.word));return t&&(e.frequency=t.f),e}toggleBlindMode(){this.blindMode=!this.blindMode}show(e,t){e&&this.search(e),t&&(this.view=t),this.dialog.show()}get open(){return this.dialog.open}close(){this.dialog.close()}};xi.styles=[ge,gi],r([ne()],xi.prototype,"view",void 0),r([ne()],xi.prototype,"query",void 0),r([ne()],xi.prototype,"result",void 0),r([ne()],xi.prototype,"showKanjiResult",void 0),r([ne()],xi.prototype,"showWordsResult",void 0),r([ce("search-history")],xi.prototype,"_history",void 0),r([ne()],xi.prototype,"blindMode",void 0),r([ce("mwc-dialog")],xi.prototype,"dialog",void 0),r([ce("mwc-textfield")],xi.prototype,"textfield",void 0),r([fe("#words-results search-item-element")],xi.prototype,"searchItemElements",void 0),xi=r([re("search-manager")],xi),window.onload=function(){const e=document.createElement("search-manager");document.body.prepend(e)}}();

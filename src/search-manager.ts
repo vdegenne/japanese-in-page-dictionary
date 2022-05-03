@@ -159,7 +159,7 @@ export class SearchManager extends LitElement {
                                }}></mwc-icon-button>
           </div>
 
-          <div style="position: relative">
+          <!-- <div style="position: relative">
             <mwc-icon-button icon="casino" @click=${(e)=>{this.onCasinoButtonClick(e)}}></mwc-icon-button>
             <mwc-menu fixed
                     @action=${(e)=>{this.onMenuListItemAction(e)}}>
@@ -179,7 +179,7 @@ export class SearchManager extends LitElement {
                     <span>jlpt1</span>
                 </mwc-list-item>
             </mwc-menu>
-          </div>
+          </div> -->
       </div>
       <!-- choice checkboxes -->
       <div>
@@ -424,21 +424,21 @@ export class SearchManager extends LitElement {
     this.dialog.close()
   }
 
-  private onCasinoButtonClick(e) {
-    const button = e.target
-    const menu = button.nextElementSibling
-    menu.anchor = button
-    menu.show()
-    // this.open()
-  }
+  // private onCasinoButtonClick(e) {
+  //   const button = e.target
+  //   const menu = button.nextElementSibling
+  //   menu.anchor = button
+  //   menu.show()
+  //   // this.open()
+  // }
 
-  private onMenuListItemAction(e) {
-    // const jlpt = 5 - e.detail.index
-    // const candidates = jlpts[e.detail.index]
-    // const random = candidates[~~(Math.random()*candidates.length)]
-    // this.show(random[0], 'words')
-    this.show(getRandomWord([5 - e.detail.index])[0])
-  }
+  // private onMenuListItemAction(e) {
+  //   // const jlpt = 5 - e.detail.index
+  //   // const candidates = jlpts[e.detail.index]
+  //   // const random = candidates[~~(Math.random()*candidates.length)]
+  //   // this.show(random[0], 'words')
+  //   this.show(getRandomWord([5 - e.detail.index])[0])
+  // }
 }
 
 export function getRandomWord (jlptsArray = [5, 4, 3, 2, 1]) {

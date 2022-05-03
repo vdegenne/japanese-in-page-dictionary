@@ -34,10 +34,12 @@ mwc-tab-bar {
 }
 
 #words-results > p, #kanji-results > p {
-  background-color: #616161;
-  color: white;
-  padding: 6px 14px;
+  background-color: #4a148c;
+  color: rgb(250, 250, 250);
+  padding: 3px 10px;
   display: inline-block;
+  border-radius: 3px;
+  margin: 35px 0 32px 10px;
 }
 
 search-item-element {
