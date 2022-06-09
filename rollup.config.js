@@ -10,6 +10,6 @@ export default {
     tsc(),
     resolve(),
     json(),
-    process.env.minify ? terser() : {},
+    process.env.minify ? terser({format: { comments: false }}) : {},
   ]
 }

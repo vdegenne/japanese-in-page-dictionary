@@ -31,6 +31,7 @@ mwc-tab-bar {
 
 #words-results, #kanji-results {
   /* padding-bottom: 52px; */
+  margin-top: 28px;
 }
 
 #words-results > p, #kanji-results > p {

@@ -80,9 +80,10 @@ export class SearchManager extends LitElement {
   @state() view: ViewType = 'words';
   @state() query: string = '';
   @state() result: SearchItem[] = []
+  @state() width?: number = undefined;
 
-  @state() showKanjiResult = true
-  @state() showWordsResult = true
+  // @state() showKanjiResult = true
+  // @state() showWordsResult = true
 
   // private _searchCache: {[query:string]: SearchItem[]} = {}
   // private _searchHistory: SearchHistoryItem[] = [{search: 'test', view: 'words'}]
@@ -133,13 +134,13 @@ export class SearchManager extends LitElement {
 
     // console.log(this.query)
     return html`
-    <mwc-dialog style="/*--mdc-dialog-min-width:calc(100vw - 32px);*/">
-      <!-- <mwc-tab-bar
+    <mwc-dialog style="--mdc-dialog-min-width:${this.width ? `${this.width}px` : 'auto'};">
+      <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
           activeIndex=${views.indexOf(this.view)}>
         <mwc-tab label=words></mwc-tab>
         <mwc-tab label=kanji></mwc-tab>
-      </mwc-tab-bar> -->
+      </mwc-tab-bar>
 
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
@@ -182,7 +183,7 @@ export class SearchManager extends LitElement {
           </div> -->
       </div>
       <!-- choice checkboxes -->
-      <div>
+      <!-- <div>
         <mwc-formfield label="kanji">
           <mwc-checkbox ?checked=${this.showKanjiResult}
             ?disabled=${this.showKanjiResult && !this.showWordsResult}
@@ -193,12 +194,12 @@ export class SearchManager extends LitElement {
             ?disabled=${this.showWordsResult && !this.showKanjiResult}
             @change=${e=>{this.showWordsResult=e.target.checked}}></mwc-checkbox>
         </mwc-formfield>
-      </div>
+      </div> -->
 
 
       <!-- KANJI RESULT -->
-      <div id="kanji-results" ?hide=${!this.showKanjiResult}>
-        <p>Kanji Results</p>
+      <div id="kanji-results" ?hide=${this.view != 'kanji'}>
+        <!-- <p>Kanji Results</p> -->
         ${kanjiResult.length === 0 ? html`no result` : nothing}
         ${kanjiResult.map(i=>{
           return html`<search-item-element .item=${i} .searchManager=${this} .revealed=${true}></search-item-element>`
@@ -222,13 +223,13 @@ export class SearchManager extends LitElement {
       </div>
 
       <!-- WORDS RESULT -->
-      <div id="words-results" ?hide=${!this.showWordsResult}>
-        <p>Words Results</p>
+      <div id="words-results" ?hide=${this.view !== 'words'}>
+        <!-- <p>Words Results</p> -->
         ${wordsResult.length === 0 ? html`no result` : nothing}
         ${wordsResult.map(i=>html`<search-item-element .item=${i} .searchManager=${this} .revealed=${!this.blindMode}></search-item-element>`)}
       </div>
 
-        <search-history .searchManager="${this}" slot=secondaryAction></search-history>
+      <search-history .searchManager="${this}" slot=secondaryAction></search-history>
 
       <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
         <mwc-checkbox ?checked=${this.blindMode}
@@ -239,7 +240,15 @@ export class SearchManager extends LitElement {
     `
   }
 
-  async updated () {
+  async updated (changedProps) {
+    if (changedProps.has('view')) {
+      await this.updateComplete
+      const content = this.dialog.shadowRoot!.querySelector('#content')!
+      console.log(content, content.clientWidth)
+      if (this.width == undefined || content.clientWidth > this.width) {
+        this.width = content.clientWidth
+      }
+    }
     await Promise.all([...this.searchItemElements].map(e=>e.updateComplete))
     // this.showShowAllInfoButton = [...this.searchItemElements].some(el => el.hasConcealedSpans())
 
