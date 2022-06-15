@@ -34,6 +34,7 @@ import jlpt1 from '../data/jlpt1-words.json'
 import { sharedStyles } from './styles/sharedStyles';
 import { Menu } from '@material/mwc-menu';
 import { SearchItemElement } from './search-item-element';
+import { TabBar } from '@material/mwc-tab-bar';
 export const jlpts: JlptWordEntry[][] = [
   jlpt5 as JlptWordEntry[],
   // [],
@@ -96,6 +97,7 @@ export class SearchManager extends LitElement {
 
   @query('mwc-dialog') dialog!: Dialog;
   @query('mwc-textfield') textfield!: TextField;
+  @query('mwc-tab-bar') tabbar!: TabBar;
   @queryAll('#words-results search-item-element') searchItemElements!: SearchItemElement[];
   // @queryAll('concealable-span') concealableSpans!: ConcealableSpan[];
   // @queryAll('concealable-span[concealed]') concealedSpans!: ConcealableSpan[];
@@ -137,7 +139,7 @@ export class SearchManager extends LitElement {
     <mwc-dialog style="--mdc-dialog-min-width:${this.width ? `${this.width}px` : 'auto'};">
       <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
-          activeIndex=${views.indexOf(this.view)}>
+          .activeIndex=${views.indexOf(this.view)}>
         <mwc-tab label=words></mwc-tab>
         <mwc-tab label=kanji></mwc-tab>
       </mwc-tab-bar>
@@ -244,10 +246,11 @@ export class SearchManager extends LitElement {
     if (changedProps.has('view')) {
       await this.updateComplete
       const content = this.dialog.shadowRoot!.querySelector('#content')!
-      console.log(content, content.clientWidth)
+      // console.log(content, content.clientWidth)
       if (this.width == undefined || content.clientWidth > this.width) {
         this.width = content.clientWidth
       }
+      this.tabbar.requestUpdate()
     }
     await Promise.all([...this.searchItemElements].map(e=>e.updateComplete))
     // this.showShowAllInfoButton = [...this.searchItemElements].some(el => el.hasConcealedSpans())
@@ -267,6 +270,17 @@ export class SearchManager extends LitElement {
     this.dialog.addEventListener('opened', dialogOpenedInitializingFct)
     this.textfield.updateComplete.then(()=>{
       this.textfield.shadowRoot!.querySelector('i')!.style.color = 'transparent'
+    })
+
+    window.addEventListener('keydown', e => {
+      if (this.open) {
+        if (e.code == 'KeyA') {
+          this.view = 'words'
+        }
+        if (e.code == 'KeyD') {
+          this.view = 'kanji'
+        }
+      }
     })
   }
 

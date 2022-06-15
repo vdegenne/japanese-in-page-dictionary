@@ -159,7 +159,7 @@ export class SearchItemElement extends LitElement {
     })
 
 
-    this.menu.addEventListener('keypress', (e)=>{
+    this.menu.addEventListener('keydown', (e)=>{
       if (this.menu.open) {
         e.stopPropagation()
         e.stopImmediatePropagation()
