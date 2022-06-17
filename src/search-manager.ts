@@ -277,7 +277,7 @@ export class SearchManager extends LitElement {
         if (e.code == 'KeyA') {
           this.view = 'words'
         }
-        if (e.code == 'KeyD') {
+        if (e.code == 'KeyF') {
           this.view = 'kanji'
         }
       }
