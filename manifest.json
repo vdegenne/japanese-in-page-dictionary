@@ -17,7 +17,14 @@
     {
       "matches": [ "<all_urls>"],
       "js": [ "webcomponents-bundle.js", "content.js" ],
-      "css": ["styles/contentscript.css"]
+      "css": ["styles/contentscript.css"],
+      "exclude_matches": [
+        "http://localhost:33771/*",
+        "http://localhost:*/*",
+        "http://localhost/*",
+        "http://127.0.0.1:*/*",
+        "http://127.0.0.1/*"
+      ]
     }
   ],
   "web_accessible_resources": [{
