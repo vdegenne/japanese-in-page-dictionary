@@ -3,7 +3,7 @@ import { customElement, property, query, queryAll, state } from 'lit/decorators.
 import {classMap} from 'lit/directives/class-map.js'
 import {live} from 'lit/directives/live.js'
 import { searchItemStyles } from './styles/searchItemElementStyles';
-import { getKanjiData, googleImageSearch, jisho, mdbg, naver, playJapaneseAudio, tatoeba } from './util';
+import { getKanjiData, goo, googleImageSearch, jisho, mdbg, naver, playJapanese, tatoeba } from './util';
 import {SearchItem, SearchManager} from './search-manager'
 
 import '@material/mwc-menu'
@@ -30,6 +30,7 @@ export class SearchItemElement extends LitElement {
   @query('mwc-menu') menu!: Menu;
   @query('mwc-list-item#google-images') googleImagesListItem!: ListItem;
   @query('mwc-list-item#jisho') jishoListItem!: ListItem;
+  @query('mwc-list-item#goo') gooListItem!: ListItem;
   @query('mwc-list-item#mdbg') mdbgListItem!: ListItem;
   @query('mwc-list-item#naver') naverListItem!: ListItem;
   @query('mwc-list-item#listen') listenListItem!: ListItem;
@@ -67,6 +68,11 @@ export class SearchItemElement extends LitElement {
           <span>Google Images</span>
           <mwc-icon slot=graphic style="color:#2196f3">images</mwc-icon>
         </mwc-list-item>
+        <!-- goo -->
+        <mwc-list-item id="goo" graphic=icon @click=${()=>{goo(this.item.word)}}>
+          <span>Goo</span>
+          <img src="chrome-extension://${extension_id}/images/goo.ico" slot="graphic">
+        </mwc-list-item>
         <!-- jisho -->
         <mwc-list-item id="jisho" graphic=icon @click=${()=>{jisho(this.item.word)}}>
           <span>Jisho</span>
@@ -86,7 +92,7 @@ export class SearchItemElement extends LitElement {
         </mwc-list-item>
         <li divider role=separator padded></li>
         <!-- listen -->
-        <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
+        <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapanese(this.item.hiragana || this.item.word)}}>
           <span>Listen</span>
           <mwc-icon slot=graphic>volume_up</mwc-icon>
         </mwc-list-item>
@@ -172,6 +178,9 @@ export class SearchItemElement extends LitElement {
         if (e.key=='g') {
           this.jishoListItem.click()
         }
+        if (e.key=='j') {
+          this.gooListItem.click()
+        }
         if (e.key=='h') {
           this.mdbgListItem.click()
         }
@@ -217,7 +226,7 @@ export class SearchItemElement extends LitElement {
     if (el === null) {
       el = target.parentElement!.querySelector('.word')!
     }
-    playJapaneseAudio(el.innerText.trim())
+    playJapanese(el.innerText.trim())
   }
 
   hasConcealedSpans () {

@@ -4,7 +4,7 @@ import { JlptWordEntry, Kanji } from './types';
 
 import lemmas from '../data/lemmas.json'
 import { searchManagerStyles } from './styles/searchManagerStyles';
-import { googleImageSearch, jisho, mdbg, naver, playJapaneseAudio } from './util';
+import { googleImageSearch, jisho, mdbg, naver, playJapanese } from './util';
 import {hasChinese} from 'asian-regexps'
 
 import '@material/mwc-dialog'
