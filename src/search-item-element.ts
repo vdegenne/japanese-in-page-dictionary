@@ -3,7 +3,7 @@ import { customElement, property, query, queryAll, state } from 'lit/decorators.
 import {classMap} from 'lit/directives/class-map.js'
 import {live} from 'lit/directives/live.js'
 import { searchItemStyles } from './styles/searchItemElementStyles';
-import { getKanjiData, goo, googleImageSearch, jisho, mdbg, naver, playJapanese, tatoeba } from './util';
+import { getKanjiData, goo, googleImageSearch, jisho, mdbg, naver, playJapaneseAudio, tatoeba } from './util';
 import {SearchItem, SearchManager} from './search-manager'
 
 import '@material/mwc-menu'
@@ -92,7 +92,7 @@ export class SearchItemElement extends LitElement {
         </mwc-list-item>
         <li divider role=separator padded></li>
         <!-- listen -->
-        <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapanese(this.item.hiragana || this.item.word)}}>
+        <mwc-list-item id="listen" graphic=icon @click=${()=>{playJapaneseAudio(this.item.hiragana || this.item.word)}}>
           <span>Listen</span>
           <mwc-icon slot=graphic>volume_up</mwc-icon>
         </mwc-list-item>
@@ -226,7 +226,7 @@ export class SearchItemElement extends LitElement {
     if (el === null) {
       el = target.parentElement!.querySelector('.word')!
     }
-    playJapanese(el.innerText.trim())
+    playJapaneseAudio(el.innerText.trim())
   }
 
   hasConcealedSpans () {

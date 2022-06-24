@@ -33,58 +33,54 @@ export function googleImageSearch (word) {
 }
 
 
-const audioMap: { [word: string]: HTMLAudioElement | Blob } = {}
 
-export async function playJapanese(word, volume = 1) {
+/**
+ * AUDIO
+ **********/
+const audioMap: {[word: string]: Blob|Promise<Response>} = {}
+
+export async function playJapanese (word, volume = 1) {
   let audio: HTMLAudioElement
   if (word in audioMap) {
-    if (audioMap[word] instanceof Blob) {
-      audio = createAudioElementFromBlob(audioMap[word] as Blob)
+    if (audioMap[word] instanceof Promise) {
+      // wait for the blob
+      const response = await audioMap[word]
+      await new Promise((resolve, reject) => { setTimeout(resolve, 100) })
     }
-    else {
-      audio = audioMap[word] as HTMLAudioElement
-    }
-    // audio = audioMap[word]
+
+    audio = createAudioElementFromBlob(audioMap[word] as Blob)
   }
   else {
-    const response = await fetch(`https://assiets.vdegenne.com/data/japanese/audio/${encodeURIComponent(word)}`)
+    const responsePromise = fetch(`https://assiets.vdegenne.com/data/japanese/audio/${encodeURIComponent(word)}`)
+    audioMap[word] = responsePromise
+    const response = await responsePromise
     const blob = audioMap[word] = await response.blob()
     audio = createAudioElementFromBlob(blob)
-    // audio = new Audio(`https://assiets.vdegenne.com/data/japanese/audio/${encodeURIComponent(word)}`)
   }
 
   return new Promise((resolve, reject) => {
-    audio.volume = volume;
+    audio.volume = volume
     audio.onerror = () => reject()
     audio.onended = () => {
       resolve(audio)
-      // if (!(word in audioMap)) {
-      //   audioMap[word] = audio
-      // }
     }
     audio.play()
   })
 }
-export function createAudioElementFromBlob(blob: Blob) {
+
+export function createAudioElementFromBlob (blob: Blob) {
   return new Audio(URL.createObjectURL(blob))
 }
 
+
 export async function playJapaneseAudio (word: string) {
   try {
+    if (word.length > 6) { throw new Error; }
     await playJapanese(word)
   } catch (e) {
     await speakJapanese(word)
   }
 }
-
-// const audios = {}
-
-// export function playJapaneseAudio (word) {
-//   if ()
-//   const audio = new Audio(`https://assiets.vdegenne.com/data/japanese/audio/${encodeURIComponent(word)}`)
-//   audio.play()
-// }
-
 
 export function getKanjiData (character: string) {
   return (_kanjis as Kanji[]).find(k => k[1] === character)
