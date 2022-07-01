@@ -20,13 +20,19 @@ mwc-textfield {
 }
 
 mwc-tab-bar {
-  position: absolute;
+  /* position: absolute;
   bottom: 57px;
   left: 0;
-  right: 0;
+  right: 0; */
   z-index: 1;
   background-color: white;
-  border: 1px solid #bdbdbd;
+  /* border: 1px solid #bdbdbd; */
+}
+
+mwc-tab[active] {
+  background-color: #ede1fd;
+  --mdc-ripple-press-opacity: 0;
+  --mdc-ripple-focus-opacity: 0;
 }
 
 #words-results, #kanji-results {

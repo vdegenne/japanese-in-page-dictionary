@@ -109,7 +109,7 @@ export class SearchItemElement extends LitElement {
           const kanjiData = getKanjiData(c)
           return html`<span class="character"
             title="${kanjiData ? `(jlpt${kanjiData[2]}) ${kanjiData[3]}//${kanjiData[4]}` : ''}"
-            @click=${e=>{this.searchManager.show(e.target.innerText.trim(), 'kanji')}}>${c}</span>`
+            @click=${e=>{this.searchManager.show(e.target.innerText.trim(), this.item.type == 'kanji' ? 'words' : 'kanji')}}>${c}</span>`
         })}
       </div>
       ${this.item.hiragana ? html`

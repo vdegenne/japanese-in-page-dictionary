@@ -137,13 +137,6 @@ export class SearchManager extends LitElement {
     // console.log(this.query)
     return html`
     <mwc-dialog style="--mdc-dialog-min-width:${this.width ? `${this.width}px` : 'auto'};">
-      <mwc-tab-bar
-          @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
-          .activeIndex=${views.indexOf(this.view)}>
-        <mwc-tab label=words></mwc-tab>
-        <mwc-tab label=kanji></mwc-tab>
-      </mwc-tab-bar>
-
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
           <div style="position:relative;flex:1">
@@ -198,13 +191,20 @@ export class SearchManager extends LitElement {
         </mwc-formfield>
       </div> -->
 
+      <mwc-tab-bar
+          @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
+          .activeIndex=${views.indexOf(this.view)}>
+        <mwc-tab label=words></mwc-tab>
+        <mwc-tab label=kanji></mwc-tab>
+      </mwc-tab-bar>
 
       <!-- KANJI RESULT -->
       <div id="kanji-results" ?hide=${this.view != 'kanji'}>
         <!-- <p>Kanji Results</p> -->
         ${kanjiResult.length === 0 ? html`no result` : nothing}
         ${kanjiResult.map(i=>{
-          return html`<search-item-element .item=${i} .searchManager=${this} .revealed=${true}></search-item-element>`
+          return html`<search-item-element .item=${i} .searchManager=${this} .revealed=${true}
+                            @character-click=${e => {console.log(e)}}></search-item-element>`
           return html`
           <div class=item>
             <div style="display:flex;justify-content:space-between;margin:12px 0 5px 0;">
