@@ -81,7 +81,10 @@ export class SearchManager extends LitElement {
   @state() view: ViewType = 'words';
   @state() query: string = '';
   @state() result: SearchItem[] = []
-  @state() width?: number = undefined;
+  @state() width?: number = 560;
+  private _rightClickPressed = false
+  private _rightClickReleasePromise: Promise<void> = Promise.resolve();
+  private _rightClickReleaseResolve;
 
   // @state() showKanjiResult = true
   // @state() showWordsResult = true
@@ -136,23 +139,23 @@ export class SearchManager extends LitElement {
 
     // console.log(this.query)
     return html`
-    <mwc-dialog style="--mdc-dialog-min-width:${this.width ? `${this.width}px` : 'auto'};">
+    <mwc-dialog style="--mdc-dialog-min-width:min(${this.width}px, 100vw);">
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
           <div style="position:relative;flex:1">
               <mwc-textfield .value=${this.query}
-                             @keypress=${e => {
-                                 if (e.key === 'Enter') {
-                                     this.search(this.textfield.value)
-                                 }
-                             }}
-                             iconTrailing=close></mwc-textfield>
+                            @keypress=${e => {
+                                if (e.key === 'Enter') {
+                                    this.search(this.textfield.value)
+                                }
+                            }}
+                            iconTrailing=close></mwc-textfield>
               <mwc-icon-button icon=close style="position:absolute;top:4px;right:4px;"
-                               @click=${() => {
-                                   this.query = '';
-                                   this.textfield.value = '';
-                                   this.textfield.focus()
-                               }}></mwc-icon-button>
+                              @click=${() => {
+                                  this.query = '';
+                                  this.textfield.value = '';
+                                  this.textfield.focus()
+                              }}></mwc-icon-button>
           </div>
 
           <!-- <div style="position: relative">
@@ -194,8 +197,8 @@ export class SearchManager extends LitElement {
       <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
           .activeIndex=${views.indexOf(this.view)}>
-        <mwc-tab label=words></mwc-tab>
-        <mwc-tab label=kanji></mwc-tab>
+        <mwc-tab label="words (${wordsResult.filter(i=>i.dictionary!='not found').length})"></mwc-tab>
+        <mwc-tab label="kanji (${kanjiResult.length})"></mwc-tab>
       </mwc-tab-bar>
 
       <!-- KANJI RESULT -->
@@ -233,10 +236,10 @@ export class SearchManager extends LitElement {
 
       <search-history .searchManager="${this}" slot=secondaryAction></search-history>
 
-      <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
+      <!-- <mwc-formfield slot=secondaryAction label="blind mode" style="--mdc-checkbox-ripple-size:32px;margin-right:10px">
         <mwc-checkbox ?checked=${this.blindMode}
           @change=${e=>{this.toggleBlindMode()}}></mwc-checkbox>
-      </mwc-formfield>
+      </mwc-formfield> -->
       <mwc-button outlined slot="secondaryAction" dialogAction="close">close</mwc-button>
     </mwc-dialog>
     `
@@ -273,6 +276,9 @@ export class SearchManager extends LitElement {
     })
 
     window.addEventListener('keydown', e => {
+      if ((e.composedPath()[0] as HTMLElement).nodeName == 'INPUT') {
+        return
+      }
       if (this.open) {
         if (e.code == 'KeyA') {
           this.view = 'words'
@@ -282,6 +288,26 @@ export class SearchManager extends LitElement {
         }
       }
     })
+
+
+    window.addEventListener('pointerdown', () => {
+      this._rightClickPressed = true
+      this._rightClickReleasePromise = new Promise(resolve => {
+        this._rightClickReleaseResolve = resolve
+      })
+    })
+    window.addEventListener('pointerup', () => {
+      this._rightClickReleaseResolve()
+      this._rightClickPressed = false
+    })
+    window.addEventListener('mouseleave', () => {
+      this._rightClickReleaseResolve()
+      this._rightClickPressed = false
+    })
+  }
+
+  get rightClickRelease () {
+    return this._rightClickReleasePromise
   }
 
 

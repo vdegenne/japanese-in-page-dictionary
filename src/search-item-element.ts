@@ -24,6 +24,7 @@ export class SearchItemElement extends LitElement {
 
   @state() revealed: boolean = false;
 
+
   private searchManager!: SearchManager;
 
   @query('#anchor') anchor!: HTMLDivElement;
@@ -141,9 +142,9 @@ export class SearchItemElement extends LitElement {
   }
 
   protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    this.addEventListener('contextmenu', e=>e.preventDefault())
-
     this.menu.anchor = this.anchor
+
+    this.addEventListener('contextmenu', e=>e.preventDefault())
 
     this.addEventListener('pointerdown', async e => {
       if (e.button === 2) {
@@ -164,28 +165,38 @@ export class SearchItemElement extends LitElement {
       }
     })
 
-
-    this.menu.addEventListener('keydown', (e)=>{
+    this.menu.addEventListener('keydown', async (e)=>{
       if (this.menu.open) {
         e.stopPropagation()
         e.stopImmediatePropagation()
         if (e.code=='KeyA') {
+          // we should wait for the click to be released
+          await this.searchManager.rightClickRelease
           this.googleImagesListItem.click()
+          // this.searchManager.close()
         }
         if (e.key=='s') {
           this.listenListItem.click()
         }
         if (e.key=='g') {
+          await this.searchManager.rightClickRelease
           this.jishoListItem.click()
+          // this.searchManager.close()
         }
         if (e.key=='j') {
+          await this.searchManager.rightClickRelease
           this.gooListItem.click()
+          // this.searchManager.close()
         }
         if (e.key=='h') {
+          await this.searchManager.rightClickRelease
           this.mdbgListItem.click()
+          // this.searchManager.close()
         }
         if (e.key=='n') {
+          await this.searchManager.rightClickRelease
           this.naverListItem.click()
+          // this.searchManager.close()
         }
       }
     })

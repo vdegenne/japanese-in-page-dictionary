@@ -37,7 +37,7 @@ mwc-tab[active] {
 
 #words-results, #kanji-results {
   /* padding-bottom: 52px; */
-  margin-top: 28px;
+  margin-top: 15px;
 }
 
 #words-results > p, #kanji-results > p {
@@ -56,7 +56,7 @@ search-item-element {
   border-bottom: 1px solid #eeeeee;
 }
 search-item-element:first-of-type {
-  padding-top: 0;
+  /* padding-top: 0; */
 }
 search-item-element:last-of-type {
   border-bottom: 0;
