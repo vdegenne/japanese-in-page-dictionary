@@ -115,7 +115,8 @@ export class SearchItemElement extends LitElement {
       </div>
       ${this.item.hiragana ? html`
           <concealable-span class=hiragana .concealed=${live(!this.revealed)}
-          ?highlight=${this.item.hiragana == this.searchManager.query}>${this.item.hiragana}</concealable-span>
+          ?highlight=${this.item.hiragana == this.searchManager.query}
+          @click=${()=>{this.searchManager.show(this.item.hiragana, 'words')}}>${this.item.hiragana}</concealable-span>
       ` : nothing}
       ${this.item.dictionary === 'not found' ? html`<span class=${tagClassMap} style="margin-left:6px">exact search</span>` : nothing}
       <div style="flex:1"></div>

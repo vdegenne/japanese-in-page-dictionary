@@ -552,7 +552,8 @@ search-item-element:last-of-type {
       </div>
       ${this.item.hiragana?F`
           <concealable-span class=hiragana .concealed=${Tt(!this.revealed)}
-          ?highlight=${this.item.hiragana==this.searchManager.query}>${this.item.hiragana}</concealable-span>
+          ?highlight=${this.item.hiragana==this.searchManager.query}
+          @click=${()=>{this.searchManager.show(this.item.hiragana,"words")}}>${this.item.hiragana}</concealable-span>
       `:$}
       ${"not found"===this.item.dictionary?F`<span class=${e} style="margin-left:6px">exact search</span>`:$}
       <div style="flex:1"></div>
