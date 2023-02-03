@@ -1,5 +1,5 @@
 {
-  "name": "japanese-inpage-dictionary",
+  "name": "japanese-inpage-dictionary2",
   "description": "",
   "version": "1.0",
   "manifest_version": 3,
@@ -7,15 +7,13 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "tabs",
-    "scripting"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
   "content_scripts": [
     {
-      "matches": [ "<all_urls>"],
+      "matches": [ "<all_urls>" ],
       "js": [ "webcomponents-bundle.js", "content.js" ],
       "css": ["styles/contentscript.css"],
       "exclude_matches": [
@@ -27,7 +25,9 @@
   ],
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
-    "resources": ["styles/contentscript.css",
+    "resources": [
+      "content.js",
+      "styles/contentscript.css",
       "fonts/MaterialIcons-Regular.woff2",
       "fonts/SawarabiMincho-Regular.ttf",
       "fonts/**",

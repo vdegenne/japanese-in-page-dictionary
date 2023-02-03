@@ -6,7 +6,7 @@ import { searchItemStyles } from './styles/searchItemElementStyles';
 import { getKanjiData, goo, googleImageSearch, jisho, mdbg, naver, playJapaneseAudio, tatoeba } from './util';
 import {SearchItem, SearchManager} from './search-manager'
 
-import '@material/mwc-menu'
+// import '@material/mwc-menu'
 import { ListItem } from '@material/mwc-list/mwc-list-item';
 
 import './concealable-span'
@@ -16,6 +16,7 @@ import { sharedStyles } from './styles/sharedStyles';
 
 // @ts-ignore
 const extension_id = chrome.runtime.id
+// const extension_id = 'kiacmdbchhlpkefogbhjmedipeabjgmj'
 
 
 @customElement('search-item-element')

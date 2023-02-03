@@ -1,40 +1,42 @@
-import { html, LitElement, nothing, PropertyValueMap } from 'lit'
-import { customElement, query, queryAll, state } from 'lit/decorators.js'
+import { html, LitElement, nothing, PropertyValueMap } from 'lit';
+import { customElement, query, queryAll, state } from 'lit/decorators.js';
 import { JlptWordEntry, Kanji } from './types';
 
-import lemmas from '../data/lemmas.json'
+import lemmas from '../data/lemmas.json';
 import { searchManagerStyles } from './styles/searchManagerStyles';
-import { googleImageSearch, jisho, mdbg, naver, playJapanese } from './util';
-import {hasChinese} from 'asian-regexps'
+import { mdbg } from './util';
+import { hasChinese } from 'asian-regexps';
 
-import '@material/mwc-dialog'
-import '@material/mwc-textfield'
-import '@material/mwc-tab-bar'
-import '@material/mwc-button'
-import '@material/mwc-formfield'
-import '@material/mwc-checkbox'
-import '@material/mwc-menu'
-import '@material/mwc-icon-button'
+import '@material/mwc-dialog';
+import '@material/mwc-textfield';
+import '@material/mwc-tab-bar';
+import '@material/mwc-button';
+import '@material/mwc-formfield';
+import '@material/mwc-checkbox';
+import '@material/mwc-menu';
+import '@material/mwc-icon-button';
 import { Dialog } from '@material/mwc-dialog';
 import { TextField } from '@material/mwc-textfield';
 
-import './search-item-element'
-import './concealable-span'
-import './search-history'
+import './search-item-element';
+import './concealable-span';
+import './search-history';
 
-import {SearchHistory} from "./search-history";
-import { ConcealableSpan } from './concealable-span';
+import { SearchHistory } from "./search-history";
 
-import _kanjis from '../data/kanjis.json'
-import jlpt5 from'../data/jlpt5-words.json'
-import jlpt4 from '../data/jlpt4-words.json'
-import jlpt3 from '../data/jlpt3-words.json'
-import jlpt2 from '../data/jlpt2-words.json'
-import jlpt1 from '../data/jlpt1-words.json'
+import _kanjis from '../data/kanjis.json';
+import jlpt5 from '../data/jlpt5-words.json';
+import jlpt4 from '../data/jlpt4-words.json';
+import jlpt3 from '../data/jlpt3-words.json';
+import jlpt2 from '../data/jlpt2-words.json';
+import jlpt1 from '../data/jlpt1-words.json';
 import { sharedStyles } from './styles/sharedStyles';
-import { Menu } from '@material/mwc-menu';
 import { SearchItemElement } from './search-item-element';
 import { TabBar } from '@material/mwc-tab-bar';
+// import { TabBar } from '@material/mwc-tab-bar';
+
+
+
 export const jlpts: JlptWordEntry[][] = [
   jlpt5 as JlptWordEntry[],
   // [],
@@ -137,19 +139,19 @@ export class SearchManager extends LitElement {
 
     // @TODO here we change the view attribute in the currently used element in the search history list
 
-    // console.log(this.query)
     return html`
     <mwc-dialog style="--mdc-dialog-min-width:min(${this.width}px, 100vw);">
       <!-- SEARCH BAR -->
       <div style="display:flex;align-items:center;position:relative">
           <div style="position:relative;flex:1">
               <mwc-textfield .value=${this.query}
-                            @keypress=${e => {
-                                if (e.key === 'Enter') {
-                                    this.search(this.textfield.value)
-                                }
-                            }}
-                            iconTrailing=close></mwc-textfield>
+                outlined
+                      @keypress=${e => {
+                          if (e.key === 'Enter') {
+                              this.search(this.textfield.value)
+                          }
+                      }}
+                      iconTrailing=close></mwc-textfield>
               <mwc-icon-button icon=close style="position:absolute;top:4px;right:4px;"
                               @click=${() => {
                                   this.query = '';
@@ -158,47 +160,13 @@ export class SearchManager extends LitElement {
                               }}></mwc-icon-button>
           </div>
 
-          <!-- <div style="position: relative">
-            <mwc-icon-button icon="casino" @click=${(e)=>{this.onCasinoButtonClick(e)}}></mwc-icon-button>
-            <mwc-menu fixed
-                    @action=${(e)=>{this.onMenuListItemAction(e)}}>
-                <mwc-list-item>
-                    <span>jlpt5</span>
-                </mwc-list-item>
-                <mwc-list-item>
-                    <span>jlpt4</span>
-                </mwc-list-item>
-                <mwc-list-item>
-                    <span>jlpt3</span>
-                </mwc-list-item>
-                <mwc-list-item>
-                    <span>jlpt2</span>
-                </mwc-list-item>
-                <mwc-list-item>
-                    <span>jlpt1</span>
-                </mwc-list-item>
-            </mwc-menu>
-          </div> -->
       </div>
-      <!-- choice checkboxes -->
-      <!-- <div>
-        <mwc-formfield label="kanji">
-          <mwc-checkbox ?checked=${this.showKanjiResult}
-            ?disabled=${this.showKanjiResult && !this.showWordsResult}
-            @change=${e=>{this.showKanjiResult=e.target.checked}}></mwc-checkbox>
-        </mwc-formfield>
-        <mwc-formfield label="words">
-          <mwc-checkbox ?checked=${this.showWordsResult}
-            ?disabled=${this.showWordsResult && !this.showKanjiResult}
-            @change=${e=>{this.showWordsResult=e.target.checked}}></mwc-checkbox>
-        </mwc-formfield>
-      </div> -->
 
       <mwc-tab-bar
           @MDCTabBar:activated=${(e)=>this.view=views[e.detail.index]}
           .activeIndex=${views.indexOf(this.view)}>
         <mwc-tab label="words (${wordsResult.filter(i=>i.dictionary!='not found').length})"></mwc-tab>
-        <mwc-tab label="kanji (${kanjiResult.length})"></mwc-tab>
+        <mwc-tab label="kanji (${kanjiResult.filter((i) => i.dictionary != 'not found').length})"></mwc-tab>
       </mwc-tab-bar>
 
       <!-- KANJI RESULT -->
